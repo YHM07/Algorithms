@@ -40,9 +40,10 @@ main ( int argc, char *argv[] )
 	printf("n = %d\n",n);
 //	num = atoi(ptr);
 //	printf("num = %d\n",num);
-	while ( *(ptr+n) != '\0' ){
-		++ n;	
-	}
+//	while ( *(ptr+n) != '\0' ){
+//		++ n;	
+//	}
+	n = strlen(ptr);
 //	printf("n = %d\n",n);
 		
 	for ( i = 0;i < n; i++ ) {
