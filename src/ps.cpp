@@ -75,28 +75,32 @@ main ( int argc, char *argv[] )
 //			cur = cur->next;
 //		}
 		
-//		for (j=1;j<m;j++,cur=cur->next){
+		for (j=1;j<m;j++,cur=cur->next){
 //			printf ( "cur->no = %d\n",cur->no );
-//		}
-//		m = cur->code;
-//		printf ( "%dth no: %d\n",i,cur->no );
-//		cur->code = cur->next->code;
-//		cur->no   = cur->next->no;
-//		p = cur->next;
-//		cur->next = cur->next->next;
-//		free(p);
-
-		for (j=1;j<m-1;j++,cur=cur->next){
-			printf ( "cur->no = %d\n",cur->no );
 		}
-		m = cur->next->code;
-		printf ( "m = %d\n",m );
-		printf ( "%dth no: %d\n",i,cur->next->no );
+		m = cur->code;
+		printf ( "%dth no: %d\n",i,cur->no );
+		cur->code = cur->next->code;
+		cur->no   = cur->next->no;
 		p = cur->next;
 		cur->next = cur->next->next;
 		free(p);
+//		p = cur;
+//		for (j = 1;j<=n;j++){
+//			printf ( "p-no:%d;p-code:%d\n",p->no,p->code );
+//			p = p->next;
+//		}
 
-
+//		for (j=1;j<m-1;j++,cur=cur->next){
+//			printf ( "cur->no = %d\n",cur->no );
+//		}
+//		m = cur->next->code;
+//		printf ( "m = %d\n",m );
+//		printf ( "%dth no: %d\n",i,cur->next->no );
+//		p = cur->next;
+//		cur->next = cur->next->next;
+//		free(p);
+//		cur = cur->next;
 	}
 	printf ( "\n" );	
 	return EXIT_SUCCESS;
