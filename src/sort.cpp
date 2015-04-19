@@ -79,7 +79,7 @@ void del(int *num,int n)
 		for (j = i+1;j < n-1; ++j) {
 			min = num[j];
 			diff = first - min;
-			if ( diff == 1 ) {
+			if ( diff == 1 || diff == 0) {
 				first = min;
 //				if ( i == n-1 ){
 //					printf ( "%d %d",max,min);					
