@@ -30,9 +30,13 @@ main ( int argc, char *argv[] )
 	if ((fp = fopen("file.txt","r")) == NULL){
 			perror("fopen error");
 	}
-	while (fscanf(fp,"%d",&data[cnt]) != EOF){
+//	while (fscanf(fp,"%d",&data[cnt]) != EOF){
+//		cnt ++;
+//	}
+	while (scanf("%d",&data[cnt]) != EOF){
 		cnt ++;
 	}
+	fclose(fp);
 	SelectSort(data,cnt);
 	for (i = 0;i < cnt; ++i){
 		printf ( "data[%d] = %d\n",i,data[i] );
@@ -51,7 +55,7 @@ void SelectSort(int A[],int n)
 {
 	int i,j;
 	int min,max;
-	for (i = 0;i <= n/2; ++i){
+	for (i = 0;i < n/2; ++i){
 		min = i;max = i;
 		for (j = i+1;j < n-i; ++j){
 			if (A[j] < A[min]){
@@ -62,12 +66,16 @@ void SelectSort(int A[],int n)
 				max = j;
 			}
 		}
-		if (min != i){
+		if (min != i ){
 			swap(&A[i],&A[min]);
+			if (max == i){
+				max = min;
+			}
 		}
-		if (max != j){
-			swap(&A[j],&A[max]);
+		if (max != n-i-1 ){
+			swap(&A[n-i-1],&A[max]);
 		}
+		
 	}
 }
 /**
