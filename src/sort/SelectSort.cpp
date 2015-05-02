@@ -66,6 +66,7 @@ void SelectSort(int A[],int n)
 				max = j;
 			}
 		}
+		/* 如果max与i值相等，那么min与i交换后，max改变，因此要保留max */
 		if (min != i ){
 			swap(&A[i],&A[min]);
 			if (max == i){
