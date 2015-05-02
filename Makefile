@@ -38,8 +38,9 @@ SRCDIR := src
 INCDIR := inc
 LIBDIR := lib 
 
-LIBS   := apue 
-# LIBS   := comm
+# 链接可以使用g++ 或者 gcc -lstdc++
+# LIBS   := apue stdc++
+LIBS   := 
 
 # VPATH := src
 vpath %.c $(SRCDIR)
