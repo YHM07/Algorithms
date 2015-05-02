@@ -30,7 +30,7 @@
 # 
 # 5 directories, 20 files
 # 
-# 
+
 EXEC   := a.out
 
 OBJDIR := output
@@ -39,20 +39,29 @@ INCDIR := inc
 LIBDIR := lib 
 
 LIBS   := apue 
+# LIBS   := comm
 
 # VPATH := src
 vpath %.c $(SRCDIR)
 vpath %.h $(INCDIR)
 
-CFLAGS := -Wall -O1 -g
-CFLAGS += $(addprefix -I, $(INCDIR)) 
-
+CFLAGS  := -Wall -O1 -g
+CFLAGS  += $(addprefix -I, $(INCDIR)) 
+CXXFLAGS := $(CFLAGS)
 LDFLAFS := $(addprefix -L,$(LIBDIR))
 LDFLAFS += $(addprefix -l,$(LIBS))
 
-CC     := gcc
-SRC    := $(wildcard *.c) $(wildcard $(SRCDIR)/*.c)
-OBJS   := $(patsubst %.c,$(OBJDIR)/%.o,$(notdir $(SRC)))
+# CC     := gcc
+CC      := g++
+# SRC    := $(wildcard *.c) $(wildcard $(SRCDIR)/*.c) 
+SRC     := $(wildcard *.c) $(wildcard *.cc) 
+# OBJS   := $(patsubst %.c,$(OBJDIR)/%.o,$(notdir $(SRC)))
+OBJS    := $(patsubst %.c, $(OBJDIR)/%.o,$(patsubst %.cc,$(OBJDIR)/%.o,$(notdir $(SRC))))
+# OBJS   += $(patsubst %.cc,$(OBJDIR)/%.o,$(notdir $(SRC)))
+
+# Archive library
+AR      := ar 
+ARFLAGS :=  
 
 # ALL:
 # 	@echo $(SRC)
@@ -64,15 +73,13 @@ OBJS   := $(patsubst %.c,$(OBJDIR)/%.o,$(notdir $(SRC)))
 
 
 $(EXEC):$(OBJS)
-	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAFS)
+	$(CC) -o $@ $^ $(CXXFLAGS) $(LDFLAFS)
 $(OBJDIR)/%.o:$(SRC)
-	$(CC) -c -o $@ $< $(CFLAGS) $(LDFLAFS)
-
-
+	$(CC) -c -o $@ $< $(CXXFLAGS) $(LDFLAFS)
 
 .PHONY : clean move
 clean:
-	rm $(OBJDIR)/*.o $(EXEC)
+	rm -f $(OBJDIR)/*.o $(EXEC)
 move:
-	find . -maxdepth 1 -type f -name "*.c" | \
-		xargs -n1 -i{} mv {} $(SRCDIR)/{}pp 
+	find . -maxdepth 1 -type f -name "*.cc" | \
+		xargs -n1 -i{} mv {} $(SRCDIR)/{} 
