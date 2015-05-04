@@ -39,9 +39,14 @@ void print(const T A[],int n)
 template <class T>
 void swap(T *p,T *q)
 {
-	T tmp;
-	tmp = *p;
-	*p  = *q;
-	*q  = tmp;
+//	T tmp;
+//	tmp = *p;
+//	*p  = *q;
+//	*q  = tmp;
+	if (*p != *q) {
+		*p ^= *q;
+		*q ^= *p;
+		*p ^= *q;
+	}
 }
 #endif  /* ---- not COMM-INL_H_*/
