@@ -18,11 +18,13 @@ int SingleNumberI(int *A,int n);
 // Given an array of integers,every element appears three times except
 // for one. Fine that single one.
 int SingleNumberII(int *A,int n);
+int SingleNumberII_1(int *A,int n);
 
 #define	BUFFSIZE 5			/*  */
 #include <stdio.h>
 
 #include <stdlib.h>
+#include "lib/comm.h"
 
 /**
  * @brief  main 
@@ -43,6 +45,7 @@ main ( int argc, char *argv[] )
 	}
 //	printf ( "SingleNumberI:%d\n",SingleNumberI(A,cnt) );
 	printf ( "SingleNumberII:%d\n",SingleNumberII(A,cnt) );
+	printf ( "SingleNumberII_1:%d\n",SingleNumberII_1(A,cnt) );
 	return EXIT_SUCCESS;
 }				/* ----------  end of function main  ---------- */
 
@@ -101,5 +104,19 @@ int SingleNumberII(int *A,int n)
  */
 int SingleNumberII_1(int *A,int n)
 {
-	
+	int bits[32] = {0};
+	for (int i = 0; i < n; ++i) {
+		for (int j = 0; j < 32; ++j) {
+			bits[j] += (A[i] >> j) & 0x01;
+		}
+	}
+//	print(bits,32);
+	int x = 0;
+	for (int i = 0; i < 32; ++i) {
+		x |= ((bits[i] % 3) << i);
+//		if (bits[i] % 3 != 0) {
+//			x += (1 << i);
+//		}
+	}
+	return x;
 }
