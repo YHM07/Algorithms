@@ -14,8 +14,10 @@
 
 template <class T>
 void print(const T A[],int n);
+//template <class T>
+//void swap(T *p,T *q);
 template <class T>
-void swap(T *p,T *q);
+void swap(T &p, T &q);
 #include "comm-inl.h"
 #endif  /* ---- not COMM_H_*/
 

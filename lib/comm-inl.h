@@ -24,7 +24,7 @@ template <class T>
 void print(const T A[],int n)
 {
 	for (int i=0;i < n; ++i){
-		std::cout << A[i] << "\t";
+		std::cout << A[i] << "  ";
 	}
 	std::cout << std::endl;
 }
@@ -36,12 +36,22 @@ void print(const T A[],int n)
  * @param	p
  * @param	q
  */
+//template <class T>
+//void swap(T *p,T *q)
+//{
+////	T tmp;
+////	tmp = *p;
+////	*p  = *q;
+////	*q  = tmp;
+//	*p ^= *q;
+//	*q ^= *p;
+//	*p ^= *q;
+//}
 template <class T>
-void swap(T *p,T *q)
+void swap(T &p, T &q)
 {
-	T tmp;
-	tmp = *p;
-	*p  = *q;
-	*q  = tmp;
+	p ^= q;
+	q ^= p;
+	p ^= q; 
 }
 #endif  /* ---- not COMM-INL_H_*/
