@@ -40,7 +40,7 @@ void print(const T A[],int n)
 template <class T>
 void swap(T &p, T &q)
 {
-	if (p ~= q) {
+	if (p != q) {
 		p ^= q;
 		q ^= p;
 		p ^= q; 
