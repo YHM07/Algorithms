@@ -90,6 +90,8 @@ endif
 $(EXECUTABLE) : $(OBJS)
 	$(CC) -o $(EXECUTABLE) $(OBJS) \
 		$(addprefix -L,$(LIBDIR)) $(addprefix -l,$(LIBS))
+# 	mv *.o $(OBJSDIR)
+# 	mv *.d $(OBJSDIR)
 
 # 隐含规则
 # $(EXECUTABLE)依赖于$(OBJS)，但makefile中没有指明$(OBJS)依赖于谁，也没指明命令生成它们；
