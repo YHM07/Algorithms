@@ -160,7 +160,6 @@ void GetNextVal(const char *p, int next[])
 		} else {
 			k = next[k];
 		}
->>>>>>> origin/master
 	}
 
 }
