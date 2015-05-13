@@ -1,5 +1,5 @@
 /**
- * @file KMP.cc
+ * @file kmp.cc
  * @brief 
  * @author H.M.Yang,hmyang07@gmail.com
  * @version v1.0
