@@ -118,9 +118,18 @@ main ( int argc, char *argv[] )
 	}
 //	printf ( "send reg msg number %d %d\n",n, __LINE__ );
 
-#ifndef CALL 
-#define	CALL	2			/* call  */
+#ifndef ACTION  
+#define	ALL_IN		4			/* all_in  */
+#define	RAISE		3			/* raise   */
+#define	CALL		2			/* call	   */
+#define	CHECK		1			/* check   */
+#define	FOLD		0			/* fold    */
+#endif                              
+
+#ifndef INQUIRE
+#define INQUIRE 3
 #endif
+
 	/* GAME START */
 	while ( true ) {
 		memset(msgbuf, 0, sizeof(msgbuf));
@@ -134,12 +143,14 @@ main ( int argc, char *argv[] )
 		/* msg handle */
 		int msgno;
 		static int iflag = 0;                   /* my cards */
+		static int lastmsg = 0;                /* last */
 //		static int oflag = 0;                   /* others cards */
 		int oflag = 0;                   /* others cards */
 		msgno = msghandle(msgbuf, &iflag, &oflag);
-		printf ( "flag = %d %d\n", iflag, __LINE__ );
+//		printf ( "flag = %d %d\n", iflag, __LINE__ );
 //		printf ( "msgno = %d %d\n", msgno, __LINE__ );
-
+		if (msgno != INQUIRE)
+			lastmsg = 0;
 		memset(msgbuf, 0, sizeof(msgbuf));
 		switch (iflag) {
 			case STRAIGHT_FLUSH:
@@ -192,13 +203,20 @@ main ( int argc, char *argv[] )
 				break;
 		}
 
-#ifndef INQUIRE
-#define INQUIRE 3
-#endif
 		if (msgno == INQUIRE) {
-			if ((n = send(sockfd, msgbuf, strlen(msgbuf), 0)) == -1) {
+			lastmsg ++;
+			if (lastmsg > 1 ) {
+				if (iflag > ONE_PAIR)  {
+					n = send(sockfd, msgbuf, strlen(msgbuf), 0);
+					perror("send msg error");
+				}
+				else {
+					sprintf(msgbuf, "fold \n");
+					n = send(sockfd, msgbuf, strlen(msgbuf), 0);
+				}
+			} else {
+				n = send(sockfd, msgbuf, strlen(msgbuf), 0);
 				perror("send msg error");
-				printf ( "send msg number %d %d\n",n, __LINE__ );
 			}
 		}
 

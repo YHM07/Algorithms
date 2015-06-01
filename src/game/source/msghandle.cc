@@ -104,11 +104,18 @@ int msghandle(const char *msg, int *iflag, int *oflag)
 				struct cards hold[2];
 				end = hold_msg(hold, pmsgbuf);
 				int ihold[2];
+				int high_card_flag ;
+				high_card_flag = 0;
 				for (int i = 0; i < 2; ++i) {
 					ihold[i] = color_msg(hold[i].color) +
 						point_msg(hold[i].point);
+					if (hold[i].point == 'A' || hold[i].point == 'K' ||
+							hold[i].point == 'Q' || hold[i].point == 'J') {
+						high_card_flag ++;
+					}
 //					printf ( "ihold = %d\n",ihold[i] );
 				}
+				card_combination(ihold, 2);
 				int tmp;
 				tmp = ihold[0] ^ ihold[1];
 				if ((tmp & 0xF0) == 0x00) {       /* FLUSH */
@@ -116,8 +123,9 @@ int msghandle(const char *msg, int *iflag, int *oflag)
 				}
 				if ((tmp & 0x0F) == 0x00) {         /* ONE_PAIR */
 					*iflag = ONE_PAIR;
-				} 
-				card_combination(ihold, 2);
+				} else {
+					*iflag = HIGH_CARD;
+				}	
 //				*iflag = judgement(2);
 				break;
 			case INQUIRE:                               /* inquire/   */
@@ -399,7 +407,7 @@ int inquire_msg(const char *msgbuf, int *oflag)
 		}
 		char action[10];
 		sscanf(inquiremsg, "%*s %*s %*s %*s %s", action);
-		printf ( "action = %s\n", action );
+//		printf ( "action = %s\n", action );
 		if (*oflag > CALL) {
 //			continue;
 		} else {
@@ -411,7 +419,7 @@ int inquire_msg(const char *msgbuf, int *oflag)
 				*oflag = CALL;
 			}
 		}
-		printf ( __FILE__ " oflag = %d %d\n", *oflag, __LINE__ );
+//		printf ( __FILE__ " oflag = %d %d\n", *oflag, __LINE__ );
 		m ++;
 
 	}
