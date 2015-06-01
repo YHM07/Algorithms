@@ -394,10 +394,14 @@ int inquire_msg(const char *msgbuf, int *oflag)
 		inquiremsg[end] = '\0';
 		length ++;                                   /* ignore the \n */
 		//		printf ( "inquiremsg = %s\n", inquiremsg );
+		if (strcmp(inquiremsg, "/inquire ") == 0) {
+			break;
+		}
 		char action[10];
 		sscanf(inquiremsg, "%*s %*s %*s %*s %s", action);
+		printf ( "action = %s\n", action );
 		if (*oflag > CALL) {
-			continue;
+//			continue;
 		} else {
 			if (strcmp(action, "all_in") == 0) {
 				*oflag = ALL_IN;
@@ -407,9 +411,7 @@ int inquire_msg(const char *msgbuf, int *oflag)
 				*oflag = CALL;
 			}
 		}
-		if (strcmp(inquiremsg, "/inquire ") == 0) {
-			break;
-		}
+		printf ( __FILE__ " oflag = %d %d\n", *oflag, __LINE__ );
 		m ++;
 
 	}
