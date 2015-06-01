@@ -16,7 +16,6 @@
 /**  @} */
 
 #include "gamelogic.h"
-#include <stdio.h>
 struct cards;
 extern struct cards ghold[];
 extern int    gcards[];
@@ -91,31 +90,6 @@ int action_msg(int card[], int m)
 //		memset(colorno, 0, sizeof(colorno));
 //		memset(pointnum, 0, sizeof(pointnum));
 	}
-	return 0;
-}
-
-/**
- * @brief  sort 对扑克按点数进行由大到小排序
- *
- * @param  card[] 已经拥有的扑克牌
- * @param  m 已经拥有的扑克牌的张数(2~7)
- *
- * @return  
- */
-int sort(int card[], int m) 
-{
-	for (int i = 0; i < m; ++i) {
-		for (int j = i  + 1; j < m; ++j) {
-			if ((card[i] & LOGIC_MASK_POINT) < (card[j] & LOGIC_MASK_POINT) ) {
-				int tmp = card[i];
-				card[i] = card[j];
-				card[j] = tmp;
-			}
-		}
-	} 
-//	for (int i = 0; i < m; ++i) {
-//		printf ( "card = %x\n", card[i] );
-//	}
 	return 0;
 }
 

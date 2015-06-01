@@ -34,6 +34,6 @@
 
 
 int action_msg(int card[], int m);
-int sort(int card[], int m);
+//int sort(int card[], int m);
 
 #endif                                          /* _GAMELOGIC_H */

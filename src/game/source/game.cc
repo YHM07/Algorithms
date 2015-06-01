@@ -117,6 +117,10 @@ main ( int argc, char *argv[] )
 //		exit(EXIT_FAILURE); 
 	}
 //	printf ( "send reg msg number %d %d\n",n, __LINE__ );
+
+#ifndef CALL 
+#define	CALL	2			/* call  */
+#endif
 	/* GAME START */
 	while ( true ) {
 		memset(msgbuf, 0, sizeof(msgbuf));
@@ -129,13 +133,15 @@ main ( int argc, char *argv[] )
 
 		/* msg handle */
 		int msgno;
-		static int flag = 0;
-		msgno = msghandle(msgbuf, &flag);
-		printf ( "flag = %d %d\n", flag, __LINE__ );
+		static int iflag = 0;                   /* my cards */
+//		static int oflag = 0;                   /* others cards */
+		int oflag = 0;                   /* others cards */
+		msgno = msghandle(msgbuf, &iflag, &oflag);
+		printf ( "flag = %d %d\n", iflag, __LINE__ );
 //		printf ( "msgno = %d %d\n", msgno, __LINE__ );
 
 		memset(msgbuf, 0, sizeof(msgbuf));
-		switch (flag) {
+		switch (iflag) {
 			case STRAIGHT_FLUSH:
 				sprintf(msgbuf, "all_in \n");
 //				printf ( "msgbuf: %s %d \n", msgbuf, __LINE__ );
@@ -161,11 +167,19 @@ main ( int argc, char *argv[] )
 //				printf ( "msgbuf: %s %d \n", msgbuf, __LINE__ );
 				break;
 			case TWO_PAIR:
-				sprintf(msgbuf, "call \n");
+				if (oflag > CALL) {
+					sprintf(msgbuf, "fold \n");
+				} else {
+					sprintf(msgbuf, "call \n");
+				}
 //				printf ( "msgbuf: %s %d \n", msgbuf, __LINE__ );
 				break;
 			case ONE_PAIR:
-				sprintf(msgbuf, "call \n");
+				if (oflag > CALL) {
+					sprintf(msgbuf, "fold \n");
+				} else {
+					sprintf(msgbuf, "call \n");
+				}
 //				printf ( "msgbuf: %s %d \n", msgbuf, __LINE__ );
 				break;
 			case HIGH_CARD:
@@ -182,8 +196,6 @@ main ( int argc, char *argv[] )
 #define INQUIRE 3
 #endif
 		if (msgno == INQUIRE) {
-//			memset(msgbuf, 0, sizeof(msgbuf));
-//			sprintf(msgbuf, "all_in \n");
 			if ((n = send(sockfd, msgbuf, strlen(msgbuf), 0)) == -1) {
 				perror("send msg error");
 				printf ( "send msg number %d %d\n",n, __LINE__ );
@@ -194,11 +206,11 @@ main ( int argc, char *argv[] )
 #ifndef GAMEOVER 
 #define GAMEOVER 10
 #endif
-		if (msgno == GAMEOVER) 
+		if (msgno == GAMEOVER) {
+			close(sockfd);
 			break;
-		
+		}
 	}
 
-	close(sockfd);
 	return EXIT_SUCCESS;
 }				/* ----------  end of function main  ---------- */

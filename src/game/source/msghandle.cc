@@ -19,6 +19,7 @@ extern int judgement(int m);
 int color_msg(char color[]);
 int point_msg(char ch);
 int card_combination(int card[], int m);
+int sort(int card[], int m);
 
 extern const char *colordata[];
 extern int gcards[];
@@ -51,6 +52,12 @@ const char *infomsg[] = {"seat/ ",
 #define	NOTIFY		9    		/* notify/    */
 #define	GAMEOVER	10			/* game-over  */
 
+/* action number */
+#define	ALL_IN		4			/* all_in  */
+#define	RAISE		3			/* raise   */
+#define	CALL		2			/* call	   */
+#define	CHECK		1			/* check   */
+#define	FOLD		0			/* fold    */
 
 /**
  * @brief	msghandle 
@@ -59,7 +66,7 @@ const char *infomsg[] = {"seat/ ",
  *
  * @return	
  */
-int msghandle(const char *msg, int *flag)
+int msghandle(const char *msg, int *iflag, int *oflag)
 {
 	int start = 0;
 	int end   = 0;
@@ -72,8 +79,10 @@ int msghandle(const char *msg, int *flag)
 		char header[128];
 		memset(header, 0, sizeof(header));
 		sscanf(&msg[start], "%[^\n]", header);
-		start += strlen(header);
-		header[start] = '\0';
+		int len = strlen(header);
+//		len = strlen(header);
+		header[len] = '\0';
+		start += len;
 		start ++;                                   /* ignore the \n */ 
 		for (int i = 0; i < 11; ++i) {
 			if (strcmp(header, infomsg[i]) == 0) {
@@ -83,6 +92,7 @@ int msghandle(const char *msg, int *flag)
 			}
 		}
 		const char *pmsgbuf = &msg[start];
+		*oflag = 0;
 		switch (msgno) {
 			case SEAT:								    /* seat/      */
 				end = seat_msg(gplayer, pmsgbuf);
@@ -97,7 +107,7 @@ int msghandle(const char *msg, int *flag)
 				for (int i = 0; i < 2; ++i) {
 					ihold[i] = color_msg(hold[i].color) +
 						point_msg(hold[i].point);
-					printf ( "ihold = %d\n",ihold[i] );
+//					printf ( "ihold = %d\n",ihold[i] );
 				}
 				int tmp;
 				tmp = ihold[0] ^ ihold[1];
@@ -105,13 +115,14 @@ int msghandle(const char *msg, int *flag)
 
 				}
 				if ((tmp & 0x0F) == 0x00) {         /* ONE_PAIR */
-					*flag = ONE_PAIR;
+					*iflag = ONE_PAIR;
 				} 
 				card_combination(ihold, 2);
-//				*flag = judgement(2);
+//				*iflag = judgement(2);
 				break;
 			case INQUIRE:                               /* inquire/   */
-				end = inquire_msg(pmsgbuf);
+				end = inquire_msg(pmsgbuf, oflag);
+				printf ( "all_in_flag = %d\n", *oflag );
 				break;
 			case FLOP:                                  /* flop/      */
 				struct cards flop[3];
@@ -120,10 +131,11 @@ int msghandle(const char *msg, int *flag)
 				for (int i = 0; i < 3; ++i) {
 					iflop[i] = color_msg(flop[i].color) +
 						point_msg(flop[i].point);
-					printf ( "iflop = %d\n",iflop[i] );
+//					printf ( "iflop = %d\n",iflop[i] );
 				}
 				card_combination(iflop, 3);
-//				*flag = judgement(5);
+				sort(gcards, 5);
+				*iflag = judgement(5);
 				break; 
 			case TURN:                                  /* turn/      */
 				struct cards turn[1];
@@ -132,7 +144,8 @@ int msghandle(const char *msg, int *flag)
 				iturn[0] = color_msg(turn[0].color) + 
 					point_msg(turn[0].point);
 				card_combination(iturn, 1);
-				//				*flag = judgement(6);
+				sort(gcards, 6);
+				*iflag = judgement(6);
 				break;
 			case RIVER:                                 /* river/     */
 				struct cards river[1];
@@ -141,7 +154,8 @@ int msghandle(const char *msg, int *flag)
 				iriver[0] = color_msg(river[0].color) + 
 					point_msg(river[0].point);
 				card_combination(iriver, 1);
-				//				*flag = judgement(7);
+				sort(gcards, 7);
+				*iflag = judgement(7);
 				break;
 			case SHOWDOWN:                              /* showdown/  */
 				end = showdown_msg(pmsgbuf);
@@ -186,7 +200,7 @@ int seat_msg(struct player_msg	player[], const char *msgbuf)
 		length ++;                                   /* ignore the \n */ 
 //		printf ( "seatmsg = %s \n", seatmsg );
 		if (strcmp(seatmsg, "/seat ") == 0) {
-			printf ( "seat return\n" );
+//			printf ( "seat return\n" );
 			break;
 		}
 		newline ++;
@@ -195,18 +209,15 @@ int seat_msg(struct player_msg	player[], const char *msgbuf)
 					&player[m].pid, &player[m].jetton, &player[m].money);
 			m ++;
 		} else {
-			if (newline >= 4) {
+			if (newline >= 4 && newline <= 8) {
 				sscanf(seatmsg, "%d %d %d",
 						&player[m].pid, &player[m].jetton, &player[m].money);
 				m ++;
 			}
 		}
 
-		//		printf ( "player : %d %d %d\n", 
-		//				player[m-1].pid, player[m-1].jetton, player[m-1].money);
-
 	}
-	printf ( "length = %d %d\n", length, __LINE__ );
+//	printf ( "length = %d %d\n", length, __LINE__ );
 	return length;
 }
 
@@ -236,7 +247,6 @@ int blind_msg(struct player_msg	*player, const char *msgbuf)
 			break;
 		}
 	}
-
 
 	return length;
 }
@@ -369,12 +379,13 @@ int turn_msg(struct cards turn[], const char *msgbuf)
  *
  * @return  
  */
-int inquire_msg(const char *msgbuf)
+int inquire_msg(const char *msgbuf, int *oflag)
 {
 	int length = 0;
 	int m = 0;
 	char inquiremsg[128];
 //	printf ( "msgbuf = %s\n", msgbuf );
+	*oflag = FOLD;
 	while (true) {
 		memset(inquiremsg, 0, sizeof(inquiremsg));
 		sscanf(&msgbuf[length], "%[^\n]", inquiremsg);
@@ -382,12 +393,27 @@ int inquire_msg(const char *msgbuf)
 		length += end;
 		inquiremsg[end] = '\0';
 		length ++;                                   /* ignore the \n */
-//		printf ( "inquiremsg = %s\n", inquiremsg );
+		//		printf ( "inquiremsg = %s\n", inquiremsg );
+		char action[10];
+		sscanf(inquiremsg, "%*s %*s %*s %*s %s", action);
+		if (*oflag > CALL) {
+			continue;
+		} else {
+			if (strcmp(action, "all_in") == 0) {
+				*oflag = ALL_IN;
+			} else if (strcmp(action, "raise") == 0) {
+				*oflag = RAISE;
+			} else if (strcmp(action, "call") == 0) {
+				*oflag = CALL;
+			}
+		}
 		if (strcmp(inquiremsg, "/inquire ") == 0) {
 			break;
 		}
 		m ++;
+
 	}
+
 	return length;
 }
 
@@ -516,16 +542,36 @@ int card_combination(int cards[], int m)
 {
 	static int cardsnum = 0;
 	for (int i = 0; i < m; ++i) {
-		printf ( "cardsnum = %d\n", cardsnum );
 		gcards[cardsnum++] = cards[i];
 	}
-	if (cardsnum >= 5) {
-		sort(gcards, cardsnum);
-		if (cardsnum >= 7)
-			cardsnum = 0;
-	}
-//	for (int i = 0; i < cardsnum; ++i) {
-//		printf ( "gcards = %d\n", gcards[i] );
+//	if (cardsnum >= 5) {
+//		sort(gcards, cardsnum);
+//		if (cardsnum == 7)
+//			cardsnum = 0;
 //	}
+	if (cardsnum == 7)
+		cardsnum = 0;
+	return 0;
+}
+
+/**
+ * @brief  sort 对扑克按点数进行由大到小排序
+ *
+ * @param  card[] 已经拥有的扑克牌
+ * @param  m 已经拥有的扑克牌的张数(2~7)
+ *
+ * @return  
+ */
+int sort(int card[], int m) 
+{
+	for (int i = 0; i < m; ++i) {
+		for (int j = i  + 1; j < m; ++j) {
+			if ((card[i] & LOGIC_MASK_POINT) < (card[j] & LOGIC_MASK_POINT) ) {
+				int tmp = card[i];
+				card[i] = card[j];
+				card[j] = tmp;
+			}
+		}
+	} 
 	return 0;
 }

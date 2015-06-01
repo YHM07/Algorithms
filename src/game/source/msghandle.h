@@ -23,14 +23,14 @@ struct player_msg {
 //	struct cards holdcards[2];
 };
 
-int msghandle(const char *msg, int *flag);
+int msghandle(const char *msg, int *flag, int *all_in_flag);
 int seat_msg(struct player_msg	player[], const char *msgbuf);
 int blind_msg(struct player_msg	*player, const char *msgbuf);
 int hold_msg(struct cards hold[], const char *msgbuf);
 int turn_msg(struct cards turn[], const char *msgbuf);
 int river_msg(struct cards river[], const char *msgbuf);
 int flop_msg(struct cards flop[], const char *msgbuf);
-int inquire_msg(const char *msgbuf);
+int inquire_msg(const char *msgbuf, int *all_in_flag);
 int showdown_msg(const char *msg);
 int potwin_msg(const char *msg);
 
